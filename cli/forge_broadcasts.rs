@@ -47,6 +47,9 @@ pub fn get_last_deployments(
 
     let mut new_deployments: HashMap<String, DeploymentObject> = HashMap::new();
 
+    // return early if directory does not exist
+    if !folder_path_buf.is_dir() { return new_deployments; }
+
     for script_dir in fs::read_dir(folder_path_buf).unwrap() {
         match script_dir {
             Ok(script_dir) => {
@@ -59,7 +62,10 @@ pub fn get_last_deployments(
                                     // println!("chain: {}", chain_dir.path().display());
                                     let filepath_buf = chain_dir.path().join("run-latest.json");
                                     // let filepath = filepath_buf.to_str().unwrap();
-
+                                    if !filepath_buf.exists() {
+                                        println!("filepath: {} does not exist", filepath_buf.to_str().unwrap());
+                                        continue;
+                                    }
                                     let data = fs::read_to_string(filepath_buf)
                                         .expect("Unable to read file");
                                     let res: FileContent =
